@@ -55,7 +55,32 @@ double CalcDiscrepancy(MatrixXd& A, VectorXd& B, MatrixXd& x)
 	{
 		res += temp(i, 0) * temp(i, 0);
 	}
-	return res / size;
+	return res/* / size */;
+}
+double CalcDiscrepancy(MatrixXd& x, VectorXd& CX)
+{
+	VectorXd temp;
+	double res = 0;
+	temp = x - CX;
+	int size = temp.rows();
+	for (int i = 0; i < size; i++)
+	{
+		res += temp(i, 0) * temp(i, 0);
+	}
+	return res /*/ size*/;
+}
+
+
+VectorXd AddNoise(VectorXd& B, float NoiseLevel)
+{
+	srand(clock());
+	VectorXd res = B;
+	int size = res.rows();
+	for (int i = 0; i < size; i++)
+	{
+		res(i) = res(i) * rand(1 - NoiseLevel, 1 + NoiseLevel);
+	}
+	return res;
 }
 
 
@@ -91,7 +116,7 @@ ostream& PrintVector(ostream& stream, VectorXd& A, const char* VectorTitle)
 		stream << "Vector " << VectorTitle << " is empty\n";
 		return stream;
 	}
-	for (int i = 0; i < size; i++)stream << setprecision(6) << setw(11) << setfill(' ') << A(i);
+	for (int i = 0; i < size; i++)stream << setprecision(6) << setw(11) << setfill(' ') << A(i) << endl;
 	stream << endl;
 	return stream;
 }
@@ -99,15 +124,22 @@ ostream& PrintVector(ostream& stream, VectorXd& A, const char* VectorTitle)
 
 void SolveLinearEquationsSystem()
 {
-	int rows(3), cols(3);
-	cout << "Write size rows x cols\n";
+	int rows(3), cols(5);
+	cout << "\n\nWrite size rows x cols\n";
 
 	cin >> rows >> cols;
 
 	auto A = CreateRandomMatrix(rows, cols);
-	auto B = CreateRandomVector(rows);
+	//MatrixXd A(rows, cols);
+	//A << 1, 2, 2, 4, 3, 5, 6, 7, 8, 9, 3, 2;
+	auto CertainX = CreateRandomVector(cols);
+	//VectorXd CertainX(cols);
+	//CertainX << 1, 1, 1, 1, 1;
+	VectorXd B = A * CertainX;
+	//B = AddNoise(B, 0.10);
 	PrintMatrix(cout, A, "A");
 	PrintVector(cout, B, "B");
+	PrintVector(cout, CertainX, "Certain X");
 
 	MatrixXd U, V;
 	VectorXd S;
@@ -116,13 +148,15 @@ void SolveLinearEquationsSystem()
 	PrintMatrix(cout, V, "V");
 	PrintVector(cout, S, "S");
 
+	cout << "\n\n Casuallity: " << S(0) / S(min(rows, cols) - 1);
 	S = sigma_1(S);
 	PrintVector(cout, S, "Inversed S");
 
 	MatrixXd x = V * S.asDiagonal();
 	x *= U.transpose();
-	x *= B;
+	x = x * B;
 	PrintMatrix(cout, x, "x");
 
-	cout << "\n\nDisperancy: " << CalcDiscrepancy(A, B, x) << endl;
+	cout << "\n\nDisperancy(dB): " << CalcDiscrepancy(A, B, x) << endl;
+	cout << "\n\nDisperancy(dX): " << CalcDiscrepancy(x, CertainX) << endl;
 }

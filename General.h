@@ -22,3 +22,6 @@ ostream& PrintVector(ostream& stream, VectorXd& A, const char* VectorTitle = "")
 void SolveLinearEquationsSystem();
 
 double CalcDiscrepancy(MatrixXd& A, VectorXd& B, MatrixXd& x);
+double CalcDiscrepancy(MatrixXd& x, VectorXd& CX);
+
+VectorXd AddNoise(VectorXd& B, float NoiseLevel);

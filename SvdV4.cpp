@@ -3,6 +3,11 @@
 
 int main()
 {
-	SolveLinearEquationsSystem();
+	char c = 0;
+	do
+	{
+		SolveLinearEquationsSystem();
+		cin >> c;
+	} while (c == 'r');
 }
 
